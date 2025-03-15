@@ -47,21 +47,21 @@ def addStealth(driver):
             fix_hairline=True,
             )
 
-def fetch_page_data(url, start_page, end_page, max_retries, output_folder, driver):
+def fetch_page_data(this_url, start_page, end_page, max_retries, output_folder, driver):
     # Storage for extracted data
     collected_data = []
     os.makedirs(output_folder, exist_ok=True)
     logging.info(f"Starting scraping from Page {start_page} to {end_page}, max retries: {max_retries}")
 
     for pageID in range(start_page, end_page):
-        url = f"{url}{pageID}"
+        page_url = f"{this_url}{pageID}"
         time.sleep(1)
 
         retries = 0
 
         while retries < max_retries:
             try:
-                driver.get(url)
+                driver.get(page_url)
 
                 pre = driver.find_elements(By.CSS_SELECTOR, "pre")
 
