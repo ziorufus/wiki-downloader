@@ -13,7 +13,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 # Define the base URL
-BASE_URL = "https://it.vikidia.org/w/api.php?format=json&action=query&prop=revisions&rvlimit=100&rvprop=ids&pageids="
+BASE_URL = "https://%LANG%.vikidia.org/w/api.php?format=json&action=query&prop=revisions&rvlimit=100&rvprop=ids&pageids="
 
 # Set up logging
 logging.basicConfig(
@@ -37,14 +37,14 @@ HEADERS = {
 }
 
 
-def fetch_page_data(start_page, end_page, max_retries, output_folder, driver):
+def fetch_page_data(url, start_page, end_page, max_retries, output_folder, driver):
     # Storage for extracted data
     collected_data = []
     os.makedirs(output_folder, exist_ok=True)
     logging.info(f"Starting scraping from Page {start_page} to {end_page}, max retries: {max_retries}")
 
     for pageID in range(start_page, end_page):
-        url = f"{BASE_URL}{pageID}"
+        url = f"{url}{pageID}"
         time.sleep(1)
 
         retries = 0
@@ -144,6 +144,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scrape a website for page data using incremental page IDs.")
     parser.add_argument("START_PAGE_ID", type=int, help="The starting page ID.")
     parser.add_argument("END_PAGE_ID", type=int, help="The ending page ID.")
+    parser.add_argument("--lang", default="it", help="Language (default: it).")
     parser.add_argument("--max_retries", type=int, default=5, help="Maximum retry attempts per page (default: 5).")
     parser.add_argument("--output", type=str, default="output.csv", help="Output CSV file name (default: output.csv)")
     parser.add_argument("--output-folder", type=str, default="pages", help="Folder to store raw page content (default: 'pages')")
@@ -161,7 +162,8 @@ if __name__ == "__main__":
     # addStealth(driver)
 
     # Run the scraper with user-defined parameters
-    data = fetch_page_data(args.START_PAGE_ID, args.END_PAGE_ID, args.max_retries, args.output_folder, driver)
+    url = BASE_URL.replace("%LANG%", args.lang)
+    data = fetch_page_data(url, args.START_PAGE_ID, args.END_PAGE_ID, args.max_retries, args.output_folder, driver)
 
     # Save the data to a CSV file
     save_to_csv(data, args.output)
