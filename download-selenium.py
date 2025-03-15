@@ -8,7 +8,6 @@ import pandas as pd
 import os
 
 from selenium import webdriver
-from selenium.common import TimeoutException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
