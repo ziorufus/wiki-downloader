@@ -12,6 +12,8 @@ from selenium.common import TimeoutException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
+from selenium_stealth import stealth
+
 # Define the base URL
 BASE_URL = "https://it.vikidia.org/w/api.php?format=json&action=query&prop=revisions&rvlimit=100&rvprop=ids&pageids="
 
@@ -36,6 +38,15 @@ HEADERS = {
     "Connection": "keep-alive"
 }
 
+def addStealth(driver):
+    stealth(driver,
+            languages=["it_IT", "it-IT", "it"],
+            vendor="Google Inc.",
+            platform="Win32",
+            webgl_vendor="Intel Inc.",
+            renderer="Intel Iris OpenGL Engine",
+            fix_hairline=True,
+            )
 
 def fetch_page_data(start_page, end_page, max_retries, output_folder, driver):
     # Storage for extracted data
@@ -158,7 +169,7 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(service=chrome_service, options=chromeOptions)
     driver.set_page_load_timeout(30)
 
-    # addStealth(driver)
+    addStealth(driver)
 
     # Run the scraper with user-defined parameters
     data = fetch_page_data(args.START_PAGE_ID, args.END_PAGE_ID, args.max_retries, args.output_folder, driver)
