@@ -63,12 +63,19 @@ def fetch_page_data(start_page, end_page, max_retries, output_folder, driver):
         while retries < max_retries:
             try:
                 driver.get(url)
-                json_data = json.loads(driver.page_source)
 
-                # response = requests.get(url, timeout=5, headers=HEADERS)
-                # response.raise_for_status()  # Raise error for HTTP failures
-                #
-                # json_data = response.json()  # Parse JSON normally
+                pre = driver.find_elements(By.CSS_SELECTOR, "pre")
+
+                try:
+                    if len(pre):
+                        json_data = json.loads(pre[0].get_attribute("innerHTML"))
+                    else:
+                        json.data = json.loads(driver.page_source)
+                except:
+                    logging.info("Error in parsing JSON, skipping.")
+                    continue
+
+                json_data = json.loads(pre[0].get_attribute("innerHTML"))
 
                 pages = json_data.get("query", {}).get("pages", {})
 
@@ -119,10 +126,9 @@ def save_page_content(title, pageID, output_folder, driver):
     try:
         driver.get(raw_url)
         content = driver.page_source
-        # json_data = json.loads(driver.page_source)
-        # response = requests.get(raw_url, headers=HEADERS, timeout=5)
-        # response.raise_for_status()
-        # content = response.text
+        pre = driver.find_elements(By.CSS_SELECTOR, "pre")
+        if len(pre):
+            content = pre[0].get_attribute("innerHTML")
 
         # Determine folder based on integer division of pageID by 1000
         subfolder = os.path.join(output_folder, str(pageID // 1000))
