@@ -124,17 +124,21 @@ def save_page_content(title, pageID, output_folder, driver):
     raw_url = f"https://it.vikidia.org/w/index.php?title={title}&action=raw"
 
     try:
-        driver.get(raw_url)
-        content = driver.page_source
-        pre = driver.find_elements(By.CSS_SELECTOR, "pre")
-        if len(pre):
-            content = pre[0].get_attribute("innerHTML")
-
         # Determine folder based on integer division of pageID by 1000
         subfolder = os.path.join(output_folder, str(pageID // 1000))
         os.makedirs(subfolder, exist_ok=True)  # Ensure subfolder exists
 
         file_path = os.path.join(subfolder, f"{pageID}.txt")
+
+        if os.path.exists(file_path):
+            logging.info(f"Raw content for Page ID {pageID} already exists, skipping.")
+            return
+
+        driver.get(raw_url)
+        content = driver.page_source
+        pre = driver.find_elements(By.CSS_SELECTOR, "pre")
+        if len(pre):
+            content = pre[0].get_attribute("innerHTML")
 
         with open(file_path, "w", encoding="utf-8") as file:
             file.write(content)
