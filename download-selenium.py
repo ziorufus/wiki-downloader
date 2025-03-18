@@ -101,6 +101,7 @@ def fetch_page_data(this_url, start_page, end_page, max_retries, output_folder, 
                         logging.info(f"Page ID {pageID} is missing, skipping.")
 
                     if len(collected_data) > 0 and len(collected_data) % save_every == 0:
+                        print("Saving data to CSV")
                         save_to_csv(collected_data, out_file)
 
                 break  # Exit retry loop if request is successful
