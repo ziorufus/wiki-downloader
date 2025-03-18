@@ -69,12 +69,10 @@ def fetch_page_data(this_url, start_page, end_page, max_retries, output_folder, 
                     if len(pre):
                         json_data = json.loads(pre[0].get_attribute("innerHTML"))
                     else:
-                        json.data = json.loads(driver.page_source)
+                        json_data = json.loads(driver.page_source)
                 except:
                     logging.info("Error in parsing JSON, skipping.")
                     continue
-
-                json_data = json.loads(pre[0].get_attribute("innerHTML"))
 
                 pages = json_data.get("query", {}).get("pages", {})
 
