@@ -47,7 +47,7 @@ def addStealth(driver):
             fix_hairline=True,
             )
 
-def fetch_page_data(this_url, start_page, end_page, max_retries, output_folder, driver):
+def fetch_page_data(this_url, start_page, end_page, max_retries, output_folder, driver, out_file, save_every):
     # Storage for extracted data
     collected_data = []
     os.makedirs(output_folder, exist_ok=True)
@@ -101,6 +101,9 @@ def fetch_page_data(this_url, start_page, end_page, max_retries, output_folder, 
                             "revisions_count": 0
                         })
                         logging.info(f"Page ID {pageID} is missing, skipping.")
+
+                    if len(collected_data) > 0 and len(collected_data) % save_every == 0:
+                        save_to_csv(collected_data, out_file)
 
                 break  # Exit retry loop if request is successful
 
@@ -161,6 +164,7 @@ if __name__ == "__main__":
     parser.add_argument("START_PAGE_ID", type=int, help="The starting page ID.")
     parser.add_argument("END_PAGE_ID", type=int, help="The ending page ID.")
     parser.add_argument("--lang", default="it", help="Language (default: it).")
+    parser.add_argument("--save-every", type=int, default=1000, help="Save every N pages.")
     parser.add_argument("--max_retries", type=int, default=5, help="Maximum retry attempts per page (default: 5).")
     parser.add_argument("--output", type=str, default="output.csv", help="Output CSV file name (default: output.csv)")
     parser.add_argument("--output-folder", type=str, default="pages", help="Folder to store raw page content (default: 'pages')")
@@ -179,7 +183,7 @@ if __name__ == "__main__":
 
     # Run the scraper with user-defined parameters
     url = BASE_URL.replace("%LANG%", args.lang)
-    data = fetch_page_data(url, args.START_PAGE_ID, args.END_PAGE_ID, args.max_retries, args.output_folder, driver)
+    data = fetch_page_data(url, args.START_PAGE_ID, args.END_PAGE_ID, args.max_retries, args.output_folder, driver, args.output, args.save_every)
 
     # Save the data to a CSV file
     save_to_csv(data, args.output)
